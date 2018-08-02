@@ -1,5 +1,5 @@
 {
-  "name": "avro-typescript",
+  "name": "@taran-a/avro-typescript",
   "version": "0.0.5",
   "description": "TypeSript code generator for Apache Avro types",
   "main": "./lib/index.js",
@@ -19,7 +19,7 @@
     "avro",
     "typescript"
   ],
-  "author": "Joe Wood",
+  "author": "Andrey Taran",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/joewood/avro-typescript/issues"
