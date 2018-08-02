@@ -4,6 +4,7 @@ import {
 	isRecordType,
 	isArrayType,
 	isEnumType,
+    isLogicalType,
 	isMapType,
 	RecordType,
 	EnumType,
@@ -29,6 +30,14 @@ function convertPrimitive(avroType: string): string {
 	}
 }
 
+const recordBuffer = new Map();
+
+function checkBufferRecord(type, ) {
+    const name = type.split('.').pop();
+    const record = recordBuffer.get(name);
+    return record
+}
+
 /** Converts an Avro record type to a TypeScript file */
 export function avroToTypeScript(recordType: RecordType): string {
 	const output: string[] = [];
@@ -44,7 +53,8 @@ function convertRecord(recordType: RecordType, fileBuffer: string[]): string {
 	}
 	buffer += "}\n";
 	fileBuffer.push(buffer);
-	return recordType.name;
+    recordBuffer.set(recordType.name, recordType.name);
+    return recordType.name;
 }
 
 /** Convert an Avro Enum type. Return the name, but add the definition to the file */
@@ -57,7 +67,7 @@ function convertEnum(enumType: EnumType, fileBuffer: string[]): string {
 function convertType(type: Type, buffer: string[]): string {
 	// if it's just a name, then use that
 	if (typeof type === "string") {
-		return convertPrimitive(type) || type;
+		return (convertPrimitive(type) || checkBufferRecord(type) || type);
 	} else if (type instanceof Array) {
 		// array means a Union. Use the names and call recursively
 		return type.map(t => convertType(t, buffer)).join(" | ");
@@ -74,6 +84,9 @@ function convertType(type: Type, buffer: string[]): string {
 	} else if (isEnumType(type)) {
 		// array, call recursively for the array element type
 		return convertEnum(type, buffer);
+	} else if (isLogicalType(type)) {
+		const { type: primitive } = type;
+		return (convertPrimitive(primitive) || primitive);
 	} else {
 		console.error("Cannot work out type", type);
 		return "UNKNOWN";
