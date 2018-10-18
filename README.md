@@ -1,39 +1,21 @@
 # Avro Typescript
 
-A simple JS library to convert Avro Schemas to TypeScript interfaces.
+A simple JS library to convert Avro Schemas to TypeScript interfaces. NodeJS
 
 ## Install
 
 ```
-npm install avro-typescript
+npm install @taran-a/avro-typescript
 ```
 
-The library can be run in node.js or the browser. It takes a Avro Schema as a JavaScript object (from JSON) and returns the TypeScript code as a string.
 
 ## Usage
 
 ```typescript
-import { avroToTypeScript, RecordType } from "avro-typescript"
+const { avroToTypeScript } = require('@taran-a/avro-typescript');
+const fs = require('fs');
 
-const schemaText = fs.readFileSync("example.avsc", "UTF8");
-const schema = JSON.parse(schemaText) as RecordType;
-console.log(avroToTypeScript(schema as RecordType));
+const schemaText = fs.readFileSync('__SCHEMA_NAME__', 'UTF8');
+const schema = JSON.parse(schemaText);
+console.log(avroToTypeScript(schema));
 ```
-
-## Features
-
-Most Avro features are supported, including:
-
-* Enumerated Types
-* Maps
-* Named Records
-* Mandatory and optional fields
-* Unions
-* Primitives
-
-### To-do
-
-* Generate a function to set defaults as per the schema
-* Add support for fixed
-* Generate JSDocs from documentation
-* Add namespace support
