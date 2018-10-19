@@ -25,6 +25,7 @@ export interface LogicalType extends BaseType {
 export interface RecordType extends BaseType {
 	type: "record";
 	name: string;
+	namespace?: string;
 	fields: Field[];
 }
 

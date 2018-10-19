@@ -1,7 +1,15 @@
-import * as fs from "fs";
-import { avroToTypeScript, RecordType } from "../lib/"
+const fs = require('fs');
+const path = require('path');
+const { avroToTypeScript } = require('../lib/');
 
-const schemaText = fs.readFileSync(__dirname + "/example.avsc", "UTF8");
+const getPath = (fileName) => path.resolve(__dirname, fileName);
+
+const schemaText = fs.readFileSync(getPath('CateringCompanyDetailsCommand-value.json'), 'utf8');
 const schema = JSON.parse(schemaText);
-console.log(avroToTypeScript(schema as RecordType));
+
+fs.writeFile(getPath('CateringCompanyDetailsCommand-value.ts'), avroToTypeScript(schema), (err) => {
+    if (err) throw (err);
+    console.log('test.ts', 'File created ');
+});
+
 

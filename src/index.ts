@@ -1,16 +1,10 @@
 import {
-	Type,
-	Field,
-	isRecordType,
-	isArrayType,
-	isEnumType,
-    isLogicalType,
-	isMapType,
-	RecordType,
-	EnumType,
-	isOptional
-} from "./model";
-export { RecordType } from "./model";
+	Type, Field, isRecordType,
+	isArrayType, isEnumType, isLogicalType,
+	isMapType, RecordType, EnumType, isOptional
+} from './model';
+import { getRecordName, capitalizeString } from './helper';
+
 /** Convert a primitive type from avro to TypeScript */
 function convertPrimitive(avroType: string): string {
 	switch (avroType) {
@@ -22,7 +16,7 @@ function convertPrimitive(avroType: string): string {
 		case "bytes":
 			return "Buffer";
 		case "null":
-			return "null | undefined";
+			return "null";
 		case "boolean":
 			return "boolean";
 		default:
@@ -32,10 +26,9 @@ function convertPrimitive(avroType: string): string {
 
 const recordBuffer = new Map();
 
-function checkBufferRecord(type, ) {
+function checkBufferRecord(type) {
     const name = type.split('.').pop();
-    const record = recordBuffer.get(name);
-    return record
+    return  recordBuffer.get(name);
 }
 
 /** Converts an Avro record type to a TypeScript file */
@@ -57,6 +50,24 @@ function convertRecord(recordType: RecordType, fileBuffer: string[]): string {
     return recordType.name;
 }
 
+function wrapUnionRecord(recordType: RecordType, fileBuffer: string[]): string {
+	const wrapUnionName = `${recordType.name}UnionWrap`;
+	let buffer = `export interface ${wrapUnionName} {\n`;
+	buffer += convertFieldUnion(recordType) + "\n";
+	buffer += "}\n";
+	fileBuffer.push(buffer);
+    recordBuffer.set(recordType.name, recordType.name);
+    return wrapUnionName;
+}
+
+function wrapUnionPrimitive(type: Field, fileBuffer: string[]): string {
+	let name = capitalizeString(`${type}UnionWrap`);
+	let buffer = `export interface ${name} {\n\t${type}: ${type}\n}\n`;
+	fileBuffer.push(buffer);
+    recordBuffer.set(type, type);
+    return name;
+}
+
 /** Convert an Avro Enum type. Return the name, but add the definition to the file */
 function convertEnum(enumType: EnumType, fileBuffer: string[]): string {
 	const enumDef = `export enum ${enumType.name} { ${enumType.symbols.join(", ")} };\n`;
@@ -64,15 +75,30 @@ function convertEnum(enumType: EnumType, fileBuffer: string[]): string {
 	return enumType.name;
 }
 
+const wrapUnionType = (type, buffer) => {
+    if (isRecordType(type)) {
+        convertType(type, buffer);
+		return wrapUnionRecord(type, buffer)
+	}
+	if (type === 'null') {
+        return convertType(type, buffer);
+	}
+	return wrapUnionPrimitive(type, buffer);
+};
+
+const convertUnion = (union, buffer) => {
+
+    return union.map(type => wrapUnionType(type, buffer)).join(" | ")
+};
+
 function convertType(type: Type, buffer: string[]): string {
 	// if it's just a name, then use that
 	if (typeof type === "string") {
 		return (convertPrimitive(type) || checkBufferRecord(type) || type);
 	} else if (type instanceof Array) {
 		// array means a Union. Use the names and call recursively
-		return type.map(t => convertType(t, buffer)).join(" | ");
+		return convertUnion(type, buffer);
 	} else if (isRecordType(type)) {
-		//} type)) {
 		// record, use the name and add to the buffer
 		return convertRecord(type, buffer);
 	} else if (isArrayType(type)) {
@@ -91,6 +117,11 @@ function convertType(type: Type, buffer: string[]): string {
 		console.error("Cannot work out type", type);
 		return "UNKNOWN";
 	}
+}
+
+function convertFieldUnion(record: RecordType): string {
+	const name = getRecordName(record);
+	return `\t${name}: ${record.name};`;
 }
 
 function convertFieldDec(field: Field, buffer: string[]): string {
