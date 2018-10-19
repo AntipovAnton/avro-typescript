@@ -80,7 +80,7 @@ const wrapUnionType = (type, buffer) => {
         convertType(type, buffer);
 		return wrapUnionRecord(type, buffer)
 	}
-    if (checkBufferRecord(type)) {
+    if (typeof type === 'string' && checkBufferRecord(type)) {
         return checkBufferRecord(type);
     }
     if (type === 'null') {
