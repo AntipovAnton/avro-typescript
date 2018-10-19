@@ -113,6 +113,8 @@ function convertType(type: Type, buffer: string[]): string {
 	} else if (isLogicalType(type)) {
 		const { type: primitive } = type;
 		return (convertPrimitive(primitive) || primitive);
+	} else if (type.type) {
+		return convertType(type.type, buffer)
 	} else {
 		console.error("Cannot work out type", type);
 		return "UNKNOWN";

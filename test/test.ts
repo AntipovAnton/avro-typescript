@@ -4,10 +4,10 @@ const { avroToTypeScript } = require('../lib/');
 
 const getPath = (fileName) => path.resolve(__dirname, fileName);
 
-const schemaText = fs.readFileSync(getPath('CateringCompanyDetailsCommand-value.json'), 'utf8');
+const schemaText = fs.readFileSync(getPath(''), 'utf8');
 const schema = JSON.parse(schemaText);
 
-fs.writeFile(getPath('CateringCompanyDetailsCommand-value.ts'), avroToTypeScript(schema), (err) => {
+fs.writeFile(getPath(''), avroToTypeScript(schema), (err) => {
     if (err) throw (err);
     console.log('test.ts', 'File created ');
 });
