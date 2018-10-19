@@ -60,9 +60,9 @@ function wrapUnionRecord(recordType: RecordType, fileBuffer: string[]): string {
     return wrapUnionName;
 }
 
-function wrapUnionPrimitive(type: Field, fileBuffer: string[]): string {
+function wrapUnionPrimitive(type: string, fileBuffer: string[]): string {
 	let name = capitalizeString(`${type}UnionWrap`);
-	let buffer = `export interface ${name} {\n\t${type}: ${type};\n}\n`;
+	let buffer = `export interface ${name} {\n\t${type}: ${convertPrimitive(type)};\n}\n`;
 	fileBuffer.push(buffer);
     recordBuffer.set(type, type);
     return name;
@@ -83,6 +83,9 @@ const wrapUnionType = (type, buffer) => {
 	if (type === 'null') {
         return convertType(type, buffer);
 	}
+	if (type.type) {
+        return wrapUnionPrimitive(type.type, buffer);
+    }
 	return wrapUnionPrimitive(type, buffer);
 };
 
