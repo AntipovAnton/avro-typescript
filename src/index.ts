@@ -62,7 +62,7 @@ function wrapUnionRecord(recordType: RecordType, fileBuffer: string[]): string {
 
 function wrapUnionPrimitive(type: Field, fileBuffer: string[]): string {
 	let name = capitalizeString(`${type}UnionWrap`);
-	let buffer = `export interface ${name} {\n    ${type}: ${type};\n}\n`;
+	let buffer = `export interface ${name} {\n\t${type}: ${type};\n}\n`;
 	fileBuffer.push(buffer);
     recordBuffer.set(type, type);
     return name;
