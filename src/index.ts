@@ -26,7 +26,7 @@ function convertPrimitive(avroType: string): string {
 	}
 }
 
-const recordBuffer = new Map();
+let recordBuffer;
 
 function checkBufferRecord(type) {
     const name = type.split('.').pop();
@@ -35,6 +35,7 @@ function checkBufferRecord(type) {
 
 /** Converts an Avro record type to a TypeScript file */
 export function avroToTypeScript(recordType: RecordType): string {
+	recordBuffer = new Map();
 	const output: string[] = [];
 	convertRecord(recordType, output);
 	return output.join("\n");
