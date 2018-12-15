@@ -19,6 +19,8 @@ function convertPrimitive(avroType: string): string {
 			return "null";
 		case "boolean":
 			return "boolean";
+		case "string":
+			return "string";
 		default:
 			return null;
 	}
