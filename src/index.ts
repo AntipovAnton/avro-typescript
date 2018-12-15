@@ -30,7 +30,7 @@ const recordBuffer = new Map();
 
 function checkBufferRecord(type) {
     const name = type.split('.').pop();
-    return  recordBuffer.get(name);
+    return recordBuffer.get(name);
 }
 
 /** Converts an Avro record type to a TypeScript file */
@@ -58,7 +58,7 @@ function wrapUnionRecord(recordType: RecordType, fileBuffer: string[]): string {
 	buffer += convertFieldUnion(recordType) + "\n";
 	buffer += "}\n";
 	fileBuffer.push(buffer);
-    recordBuffer.set(recordType.name, recordType.name);
+    recordBuffer.set(wrapUnionName, wrapUnionName);
     return wrapUnionName;
 }
 
@@ -82,8 +82,11 @@ const wrapUnionType = (type, buffer) => {
         convertType(type, buffer);
 		return wrapUnionRecord(type, buffer)
 	}
-    if (typeof type === 'string' && checkBufferRecord(type)) {
-        return checkBufferRecord(type);
+    if (typeof type === 'string' && checkBufferRecord(`${type}UnionWrap`)) {
+        return checkBufferRecord(`${type}UnionWrap`);
+    }
+    if (typeof type === 'string' && checkBufferRecord(`${capitalizeString(type)}UnionWrap`)) {
+        return checkBufferRecord(`${capitalizeString(type)}UnionWrap`);
     }
     if (type === 'null') {
         return convertType(type, buffer);
