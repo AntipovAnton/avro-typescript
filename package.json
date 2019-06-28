@@ -1,5 +1,5 @@
 {
-  "name": "@antipov-a/avro-typescript",
+  "name": "@antipovanton/avro-typescript",
   "version": "0.0.6",
   "description": "TypeSript code generator for Apache Avro types",
   "main": "./lib/index.js",
