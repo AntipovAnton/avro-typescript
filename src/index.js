@@ -1,7 +1,7 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const model_1 = require("./model");
-const helper_1 = require("./helper");
+exports.__esModule = true;
+var model_1 = require("./model");
+var helper_1 = require("./helper");
 /** Convert a primitive type from avro to TypeScript */
 function convertPrimitive(avroType) {
     switch (avroType) {
@@ -22,23 +22,24 @@ function convertPrimitive(avroType) {
             return null;
     }
 }
-let recordBuffer;
+var recordBuffer;
 function checkBufferRecord(type) {
-    const name = type.split('.').pop();
+    var name = type.split('.').pop();
     return recordBuffer.get(name);
 }
 /** Converts an Avro record type to a TypeScript file */
 function avroToTypeScript(recordType) {
     recordBuffer = new Map();
-    const output = [];
+    var output = [];
     convertRecord(recordType, output);
     return output.join("\n");
 }
 exports.avroToTypeScript = avroToTypeScript;
 /** Convert an Avro Record type. Return the name, but add the definition to the file */
 function convertRecord(recordType, fileBuffer) {
-    let buffer = `export interface ${recordType.name} {\n`;
-    for (let field of recordType.fields) {
+    var buffer = "export interface " + recordType.name + " {\n";
+    for (var _i = 0, _a = recordType.fields; _i < _a.length; _i++) {
+        var field = _a[_i];
         buffer += convertFieldDec(field, fileBuffer) + "\n";
     }
     buffer += "}\n";
@@ -47,8 +48,8 @@ function convertRecord(recordType, fileBuffer) {
     return recordType.name;
 }
 function wrapUnionRecord(recordType, fileBuffer) {
-    const wrapUnionName = `${recordType.name}UnionWrap`;
-    let buffer = `export interface ${wrapUnionName} {\n`;
+    var wrapUnionName = recordType.name + "UnionWrap";
+    var buffer = "export interface " + wrapUnionName + " {\n";
     buffer += convertFieldUnion(recordType) + "\n";
     buffer += "}\n";
     fileBuffer.push(buffer);
@@ -56,28 +57,28 @@ function wrapUnionRecord(recordType, fileBuffer) {
     return wrapUnionName;
 }
 function wrapUnionPrimitive(type, fileBuffer) {
-    let name = helper_1.capitalizeString(`${type}UnionWrap`);
-    let buffer = `export interface ${name} {\n\t${type}: ${convertPrimitive(type)};\n}\n`;
+    var name = helper_1.capitalizeString(type + "UnionWrap");
+    var buffer = "export interface " + name + " {\n\t" + type + ": " + convertPrimitive(type) + ";\n}\n";
     fileBuffer.push(buffer);
     recordBuffer.set(name, name);
     return name;
 }
 /** Convert an Avro Enum type. Return the name, but add the definition to the file */
 function convertEnum(enumType, fileBuffer) {
-    const enumDef = `export enum ${enumType.name} { ${enumType.symbols.join(", ")} };\n`;
+    var enumDef = "export enum " + enumType.name + " { " + enumType.symbols.join(", ") + " };\n";
     fileBuffer.push(enumDef);
     return enumType.name;
 }
-const wrapUnionType = (type, buffer) => {
+var wrapUnionType = function (type, buffer) {
     if (model_1.isRecordType(type)) {
         convertType(type, buffer);
         return wrapUnionRecord(type, buffer);
     }
-    if (typeof type === 'string' && checkBufferRecord(`${type}UnionWrap`)) {
-        return checkBufferRecord(`${type}UnionWrap`);
+    if (typeof type === 'string' && checkBufferRecord(type + "UnionWrap")) {
+        return checkBufferRecord(type + "UnionWrap");
     }
-    if (typeof type === 'string' && checkBufferRecord(`${helper_1.capitalizeString(type)}UnionWrap`)) {
-        return checkBufferRecord(`${helper_1.capitalizeString(type)}UnionWrap`);
+    if (typeof type === 'string' && checkBufferRecord(helper_1.capitalizeString(type) + "UnionWrap")) {
+        return checkBufferRecord(helper_1.capitalizeString(type) + "UnionWrap");
     }
     if (type === 'null') {
         return convertType(type, buffer);
@@ -90,8 +91,8 @@ const wrapUnionType = (type, buffer) => {
     }
     return wrapUnionPrimitive(type, buffer);
 };
-const convertUnion = (union, buffer) => {
-    return union.map(type => wrapUnionType(type, buffer)).join(" | ");
+var convertUnion = function (union, buffer) {
+    return union.map(function (type) { return wrapUnionType(type, buffer); }).join(" | ");
 };
 function convertType(type, buffer) {
     // if it's just a name, then use that
@@ -112,14 +113,14 @@ function convertType(type, buffer) {
     }
     else if (model_1.isMapType(type)) {
         // Dictionary of types, string as key
-        return `{ [index:string]:${convertType(type.values, buffer)} }`;
+        return "{ [index:string]:" + convertType(type.values, buffer) + " }";
     }
     else if (model_1.isEnumType(type)) {
         // array, call recursively for the array element type
         return convertEnum(type, buffer);
     }
     else if (model_1.isLogicalType(type)) {
-        const { type: primitive } = type;
+        var primitive = type.type;
         return (convertPrimitive(primitive) || primitive);
     }
     else if (type.type) {
@@ -131,10 +132,10 @@ function convertType(type, buffer) {
     }
 }
 function convertFieldUnion(record) {
-    const name = helper_1.getRecordName(record);
-    return `\t${name}: ${record.name};`;
+    var name = helper_1.getRecordName(record);
+    return "\t" + name + ": " + record.name + ";";
 }
 function convertFieldDec(field, buffer) {
     // Union Type
-    return `\t${field.name}${model_1.isOptional(field.type) ? "?" : ""}: ${convertType(field.type, buffer)};`;
+    return "\t" + field.name + (model_1.isOptional(field.type) ? "?" : "") + ": " + convertType(field.type, buffer) + ";";
 }

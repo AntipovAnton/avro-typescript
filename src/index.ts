@@ -92,8 +92,8 @@ const wrapUnionType = (type, buffer) => {
     if (type === 'null') {
         return convertType(type, buffer);
 	}
-    if (type.type === 'array') {
-		return wrapUnionType(type.items, buffer);
+	if (type.type === 'array') {
+		return convertType(type.items, buffer) + "[]";
 	}
     if (type.type) {
         return wrapUnionPrimitive(type.type, buffer);
