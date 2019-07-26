@@ -93,7 +93,7 @@ const wrapUnionType = (type, buffer) => {
         return convertType(type, buffer);
 	}
 	if (type.type === 'array') {
-		return convertType(type.items, buffer) + "[]";
+		return convertType(type.items, buffer);
 	}
     if (type.type) {
         return wrapUnionPrimitive(type.type, buffer);
@@ -106,10 +106,16 @@ const convertUnion = (union, buffer) => {
     return union.map(type => wrapUnionType(type, buffer)).join(" | ")
 };
 
-function convertType(type: Type, buffer: string[]): string {
+function convertType(type: any, buffer: string[]): string {
 	// if it's just a name, then use that
 	if (typeof type === "string") {
 		return (convertPrimitive(type) || checkBufferRecord(type) || type);
+	}
+	else if (type instanceof Array
+			&& type[0] === "null"
+			&& type[1].name !== "SagaId"
+			&& type[1].name !== "ActivityFlowId") {
+			return convertUnion(type, buffer) + "[]";
 	} else if (type instanceof Array) {
 		// array means a Union. Use the names and call recursively
 		return convertUnion(type, buffer);
