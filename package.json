@@ -1,6 +1,6 @@
 {
   "name": "@antipovanton/avro-typescript",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "TypeSript code generator for Apache Avro types",
   "main": "./lib/index.js",
   "directories": {

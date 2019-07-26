@@ -111,10 +111,7 @@ function convertType(type: any, buffer: string[]): string {
 	if (typeof type === "string") {
 		return (convertPrimitive(type) || checkBufferRecord(type) || type);
 	}
-	else if (type instanceof Array
-			&& type[0] === "null"
-			&& type[1].name !== "SagaId"
-			&& type[1].name !== "ActivityFlowId") {
+	else if (type instanceof Array && type[0] === "null" && type[1].items) {
 			return convertUnion(type, buffer) + "[]";
 	} else if (type instanceof Array) {
 		// array means a Union. Use the names and call recursively
